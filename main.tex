@@ -1,0 +1,171 @@
+\documentclass{beamer}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\title{Server Administration \newline with NixOS}
+\author{by mrtuxa}
+\date{2023}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{lipsum}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Contact}
+
+\href{http://www.latex-tutorial.com}{Matrix: @mrtuxa:sys2nix.de} \\
+\href{https://zug.network/@mrtuxa}{Mastodon: @mrtuxa@zug.network} \\
+\href{mailto:mrtuxa@infra-sys.de}{E-Mail: mrtuxa@infra-sys.de} \\
+\href{mailto:mrtuxa@leipzig.freifunk.net}{E-Mail: mrtuxa@leipzig.freifunk.net}
+    
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Nix Flakes}
+
+\begin{lstlisting}[language=c++]
+{
+  {
+  	inputs = {
+    		nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
+    		unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    		home-manager = {
+      		url = "github:nix-community/home-manager";
+      		inputs.nixpkgs.follows = "nixpkgs";
+    		};
+  	};
+  }
+}
+\end{lstlisting}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Nix Flakes}
+
+\begin{lstlisting}[language=c++]
+{
+  outputs = inputs @ {
+    nixpkgs,
+    unstable,
+    home-manager,
+    ...
+  }: {
+    nixosConfigurations = {
+      mrtuxaServer = unstable.lib.nixosSystem {
+				system = "x86_64-linux";
+        modules = [./hosts/dezentrale];
+      };
+    };
+  };
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Nix Expressions File Structure}
+
+\begin{lstlisting}[language=bash]
+
+flake.lock
+flake.nix
+hosts/
+	dezentrale/
+		default.nix
+		hardware-configuration.nix
+modules/
+	reverse-proxy.nix
+secrets/
+	homeserver.yaml
+	vapidPrivateKey
+services/
+	communication/
+		default.nix
+		mail.nix
+		turn.nix
+		social/
+
+\end{lstlisting}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Nix Expressions File Structure}
+
+\begin{lstlisting}[language=bash]
+		social/
+			mastodon.nix
+			matrix.nix
+website/
+	# static pages
+
+\end{lstlisting}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Nix Expressions File Structure}
+\begin{table}
+\begin{tabularx}{\linewidth}{>{\parskip1ex}X@{\kern4\tabcolsep}>{\parskip1ex}X}
+\toprule
+\hfil\bfseries Pros
+&
+\hfil\bfseries Cons
+\\\cmidrule(r{3\tabcolsep}){1-1}\cmidrule(l{-\tabcolsep}){2-2}
+
+%% PROS, seperated by empty line or \par
+Nixos\par
+ist\par
+cool
+&
+
+%% CONS, seperated by empty line or \par
+Nixos\par
+ist\par
+uncool
+
+\\\bottomrule
+\end{tabularx}
+\end{table}
+\end{frame}
+
+\end{document}
